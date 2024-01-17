@@ -1,7 +1,7 @@
 {
     "name": "Node.js",
     "dockerComposeFile": "docker-compose.yml",
-    "service": "app",
+    "service": "devcontainer",
     "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
     "waitFor": "onCreateCommand",
     "updateContentCommand": "npm install",
