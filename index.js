@@ -47,4 +47,8 @@ app.get('/boxes',async (req,res)=>{
     res.json(boxes[0]);
 });//Return boxes to the user
 
+// app.post('/sendPayment', async(req,res)=>{
+    
+// });//Sends a payment to Redis
+
 console.log('Hello');
