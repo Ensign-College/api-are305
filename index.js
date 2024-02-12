@@ -47,8 +47,49 @@ app.get('/boxes',async (req,res)=>{
     res.json(boxes[0]);
 });//Return boxes to the user
 
-// app.post('/sendPayment', async(req,res)=>{
-    
-// });//Sends a payment to Redis
+app.post('/sendPayment', async(req,res)=>{
+    try {
+        const {
+            customerId,
+            billingAddress,
+            billingCity,
+            billingState,
+            billingZipCode,
+            totalAmount,
+            paymentId,
+            cardId,
+            cardType,
+            last4digits,
+            orderId
+        } = req.body;
+
+        // Construct the payment object
+        const payment = {
+            customerId,
+            billingAddress,
+            billingCity,
+            billingState,
+            billingZipCode,
+            totalAmount,
+            paymentId,
+            cardId,
+            cardType,
+            last4digits,
+            orderId
+        };
+
+        // Generate a unique key for the payment using current datetime
+        const currentDate = new Date().toISOString().replace(/:/g, '-'); // Format datetime to avoid invalid characters
+        const paymentKey = `payment_${currentDate}`;
+
+        // Store the payment information in Redis as a JSON object
+        await redisClient.json.set(paymentKey, '.', payment);
+
+        res.status(200).json({ message: 'Payment successfully stored in Redis' });
+    } catch (error) {
+        console.error('Error storing payment in Redis:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});//Sends a payment to Redis
 
 console.log('Hello');
