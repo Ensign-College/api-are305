@@ -92,4 +92,43 @@ app.post('/sendPayment', async(req,res)=>{
     }
 });//Sends a payment to Redis
 
+app.get('/payments/:customerId?', async (req, res) => {
+    try {
+        const { customerId } = req.params;
+
+        if (customerId) {
+            // Search for all payment keys that correspond to the provided customerId
+            const paymentKeys = await redisClient.keys('payment_*');
+            const payments = [];
+
+            for (const key of paymentKeys) {
+                const payment = await redisClient.json.get(key, { path: '.' });
+                if (payment.customerId == customerId) {
+                    payments.push(payment);
+                }
+            }
+
+            if (payments.length > 0) {
+                res.status(200).json(payments);
+            } else {
+                res.status(404).json({ error: 'No payments found for the given customer ID' });
+            }
+        } else {
+            // No customerId provided, retrieve all payments
+            const paymentKeys = await redisClient.keys('payment_*');
+            const allPayments = [];
+
+            for (const key of paymentKeys) {
+                const payment = await redisClient.json.get(key, { path: '.' });
+                allPayments.push(payment);
+            }
+
+            res.status(200).json(allPayments);
+        }
+    } catch (error) {
+        console.error('Error retrieving payments from Redis:', error);
+        res.status(500).json({ error: 'Error retrieving payments from Redis', details: error.message });
+    }
+});
+
 console.log('Hello');
