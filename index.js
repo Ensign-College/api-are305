@@ -2,6 +2,7 @@ const express = require('express');//Express makes API to connect FrontEnd with 
 const bodyParser = require('body-parser');
 const Redis = require('redis');//Import the Redis library
 const cors = require('cors');
+const { v4: uuidv4 } = require('uuid'); // Import uuidv4 function from uuid package
 
 const options = {
     origin: 'http://localhost:3000'//allow our frontend to call this backend
@@ -55,13 +56,18 @@ app.post('/sendPayment', async(req,res)=>{
             billingCity,
             billingState,
             billingZipCode,
+            phone,
             totalAmount,
-            paymentId,
             cardId,
             cardType,
             last4digits,
             orderId
         } = req.body;
+
+        // Generate a unique payment ID
+        //const paymentId = uuidv4();
+        // Atomically increment the paymentId in Redis
+        const paymentId = await redisClient.incr('paymentId');
 
         // Construct the payment object
         const payment = {
@@ -70,6 +76,7 @@ app.post('/sendPayment', async(req,res)=>{
             billingCity,
             billingState,
             billingZipCode,
+            phone,
             totalAmount,
             paymentId,
             cardId,
@@ -80,7 +87,7 @@ app.post('/sendPayment', async(req,res)=>{
 
         // Generate a unique key for the payment using current datetime
         const currentDate = new Date().toISOString().replace(/:/g, '-'); // Format datetime to avoid invalid characters
-        const paymentKey = `payment_${currentDate}`;
+        const paymentKey = `payment_${payment.phone}_${currentDate}`;
 
         // Store the payment information in Redis as a JSON object
         await redisClient.json.set(paymentKey, '.', payment);
