@@ -72,7 +72,7 @@ app.post('/sendPayment', async(req,res)=>{
         // Reassign customerId to phone number
         customerId = phone;
 
-        // Generate a unique payment ID using phone and current date
+        // Generate a unique payment ID using customerId and timestamp
         const paymentId = `${customerId}-${Date.now().toString()}`;
 
         // Construct the payment object
