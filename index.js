@@ -70,10 +70,8 @@ app.post('/sendPayment', async(req,res)=>{
             orderId
         } = req.body;
 
-        // Generate a unique payment ID
-        //const paymentId = uuidv4();
-        // Atomically increment the paymentId in Redis
-        const paymentId = await redisClient.incr('paymentId');
+        // Generate a unique payment ID using phone and current date
+        const paymentId = `${phone}_${new Date().toISOString().replace(/:/g, '-')}`;
 
         // Construct the payment object
         const payment = {
@@ -91,9 +89,8 @@ app.post('/sendPayment', async(req,res)=>{
             orderId
         };
 
-        // Generate a unique key for the payment using current datetime
-        const currentDate = new Date().toISOString().replace(/:/g, '-'); // Format datetime to avoid invalid characters
-        const paymentKey = `payment_${payment.phone}_${currentDate}`;
+        // Generate a unique key for the payment using phone and current date
+        const paymentKey = `payment_${phone}_${new Date().toISOString().replace(/:/g, '-')}`;
 
         // Store the payment information in Redis as a JSON object
         await redisClient.json.set(paymentKey, '.', payment);
@@ -105,7 +102,26 @@ app.post('/sendPayment', async(req,res)=>{
     }
 });//Sends a payment to Redis
 
-app.get('/payments/:customerId?', async (req, res) => {
+app.get('/payment/:paymentId', async (req, res) => {
+    try {
+        const paymentId = req.params.paymentId;
+
+        // Retrieve payment from Redis
+        const paymentKey = `payment_${paymentId}`;
+        const payment = await redisClient.json.get(paymentKey, { path: '.' });
+
+        if (payment) {
+            res.status(200).json(payment);
+        } else {
+            res.status(404).json({ error: 'Payment not found for the given payment ID' });
+        }
+    } catch (error) {
+        console.error('Error retrieving payment from Redis:', error);
+        res.status(500).json({ error: 'Error retrieving payment from Redis', details: error.message });
+    }
+});
+
+app.get('/paymentsPerCustomer/:customerId?', async (req, res) => {
     try {
         const { customerId } = req.params;
 
