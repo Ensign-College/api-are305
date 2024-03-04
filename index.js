@@ -56,8 +56,7 @@ app.get('/boxes',async (req,res)=>{
 
 app.post('/sendPayment', async(req,res)=>{
     try {
-        const {
-            customerId,
+        let {
             billingAddress,
             billingCity,
             billingState,
@@ -70,8 +69,11 @@ app.post('/sendPayment', async(req,res)=>{
             orderId
         } = req.body;
 
+        // Reassign customerId to phone number
+        customerId = phone;
+
         // Generate a unique payment ID using phone and current date
-        const paymentId = `${phone}_${new Date().toISOString().replace(/:/g, '-')}`;
+        const paymentId = `${customerId}-${Date.now().toString()}`;
 
         // Construct the payment object
         const payment = {
@@ -90,7 +92,7 @@ app.post('/sendPayment', async(req,res)=>{
         };
 
         // Generate a unique key for the payment using phone and current date
-        const paymentKey = `payment_${phone}_${new Date().toISOString().replace(/:/g, '-')}`;
+        const paymentKey = `payment-${paymentId}`;
 
         // Store the payment information in Redis as a JSON object
         await redisClient.json.set(paymentKey, '.', payment);
@@ -105,9 +107,10 @@ app.post('/sendPayment', async(req,res)=>{
 app.get('/payment/:paymentId', async (req, res) => {
     try {
         const paymentId = req.params.paymentId;
-
+        
         // Retrieve payment from Redis
-        const paymentKey = `payment_${paymentId}`;
+        const paymentKey = `payment-${paymentId}`;
+
         const payment = await redisClient.json.get(paymentKey, { path: '.' });
 
         if (payment) {
