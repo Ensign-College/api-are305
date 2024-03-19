@@ -1,61 +1,56 @@
-const express = require('express');//Express makes API to connect FrontEnd with Database
-const bodyParser = require('body-parser');
-const Redis = require('redis');//Import the Redis library
-const cors = require('cors');
-const { v4: uuidv4 } = require('uuid'); // Import uuidv4 function from uuid package
-const {addOrder, getOrder} = require("./services/orderservice.js")//import the addOrder function from the ord
-const {addOrderItem, getOrderItem} = require("./services/orderItems")//import the addOrderItem function from
-const fs = require("fs");//import the file system library
-const Schema = JSON.parse(fs.readFileSync("./orderItemSchema.json","utf8")); //read the orderItemSchema.json file
-const Ajv = require("ajv"); //import the ajv library
-const ajv = new Ajv();//create an ajv object to validate.JSON
-
-const options = {
-    origin: 'http://localhost:3000'//allow our frontend to call this backend
-}
-
-//import express from 'express'; <- modern way
-
+const Redis = require('redis');
+const { v4: uuidv4 } = require('uuid');
+const { addOrder, getOrder } = require("./services/orderservice.js");
+const { addOrderItem, getOrderItem } = require("./services/orderItems");
+const fs = require("fs");
+const Schema = JSON.parse(fs.readFileSync("./orderItemSchema.json", "utf8"));
+const Ajv = require("ajv");
+const ajv = new Ajv();
 const redisClient = Redis.createClient({
-    url:`redis://localhost:6379`
-});
-const app = new express(); //Create an Express application
-const port = 3001;//this is the port number
-
-app.use(bodyParser.json());
-app.use(cors(options));
-
-app.listen(port,()=>{
-    redisClient.connect();//this connects to the Redis database
-    console.log(`API is Listening on port: ${port}`);//template literal
-});//Listen for web requests from the FrontEnd and don't stop
-
-// POST request to add a new box
-app.post('/boxes', async (req, res) => {
-    //const { boxId, boxValue } = req.body;
-    const newBox = req.body;
-    newBox.id = parseInt(await redisClient.json.arrLen('boxes', '$'))+1;//user should not be allowed to choose the id
-
-    // Update the "boxes" object in the Redis database
-    await redisClient.json.arrAppend('boxes', '$', newBox);
-
-    // Send the updated boxes to the browser
-    res.json(newBox);
+    url: `redis://your-redis-endpoint:6379`
 });
 
-// 1-URL
-// 2-a function to return boxes
-// req= the request from the browser
-// res= the response from the browser
-app.get('/boxes',async (req,res)=>{
-    let boxes = await redisClient.json.get('boxes',{path:'$'});//get theboxes
-    //Send the boxes to the browser
-    //res.send(JSON.stringify(boxes));//Convert boxes to a string
-    res.json(boxes[0]);
-});//Return boxes to the user
-
-app.post('/sendPayment', async(req,res)=>{
+// Function to handle POST requests for adding boxes
+exports.addBoxHandler = async (event, context) => {
     try {
+        const requestBody = JSON.parse(event.body);
+        const newBox = requestBody;
+        newBox.id = parseInt(await redisClient.json.arrLen('boxes', '$')) + 1;
+
+        await redisClient.json.arrAppend('boxes', '$', newBox);
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify(newBox)
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Internal server error' })
+        };
+    }
+};
+
+// Function to handle GET requests for boxes
+exports.getBoxesHandler = async (event, context) => {
+    try {
+        let boxes = await redisClient.json.get('boxes', { path: '$' });
+        return {
+            statusCode: 200,
+            body: JSON.stringify(boxes[0])
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Internal server error' })
+        };
+    }
+};
+
+// Function to handle POST requests for sending payments
+exports.sendPaymentHandler = async (event, context) => {
+    try {
+        const requestBody = JSON.parse(event.body);
         let {
             billingAddress,
             billingCity,
@@ -67,7 +62,7 @@ app.post('/sendPayment', async(req,res)=>{
             cardType,
             last4digits,
             orderId
-        } = req.body;
+        } = requestBody;
 
         // Reassign customerId to phone number
         customerId = phone;
@@ -97,53 +92,72 @@ app.post('/sendPayment', async(req,res)=>{
         // Store the payment information in Redis as a JSON object
         await redisClient.json.set(paymentKey, '.', payment);
 
-        res.status(200).json({ message: 'Payment successfully stored in Redis' });
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: 'Payment successfully stored in Redis' })
+        };
     } catch (error) {
-        console.error('Error storing payment in Redis:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Internal server error' })
+        };
     }
-});//Sends a payment to Redis
+};
 
-app.get('/payment/:paymentId', async (req, res) => {
+// Function to handle GET requests for payment by ID
+exports.getPaymentHandler = async (event, context) => {
     try {
-        const paymentId = req.params.paymentId;
-        
+        const paymentId = event.pathParameters.paymentId;
+
         // Retrieve payment from Redis
         const paymentKey = `payment-${paymentId}`;
 
         const payment = await redisClient.json.get(paymentKey, { path: '.' });
 
         if (payment) {
-            res.status(200).json(payment);
+            return {
+                statusCode: 200,
+                body: JSON.stringify(payment)
+            };
         } else {
-            res.status(404).json({ error: 'Payment not found for the given payment ID' });
+            return {
+                statusCode: 404,
+                body: JSON.stringify({ error: 'Payment not found for the given payment ID' })
+            };
         }
     } catch (error) {
-        console.error('Error retrieving payment from Redis:', error);
-        res.status(500).json({ error: 'Error retrieving payment from Redis', details: error.message });
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Error retrieving payment from Redis', details: error.message })
+        };
     }
-});
+};
 
-app.get('/paymentsPerCustomer/:customerId?', async (req, res) => {
+// Function to handle GET requests for payments per customer
+exports.getPaymentsPerCustomerHandler = async (event, context) => {
     try {
-        const { customerId } = req.params;
+        const customerId = event.pathParameters.customerId;
 
         if (customerId) {
             // Search for all payment keys that correspond to the provided customerId
-            const paymentKeys = await redisClient.keys('payment_*');
+            const paymentKeys = await redisClient.keys(`payment_${customerId}_*`);
             const payments = [];
 
             for (const key of paymentKeys) {
                 const payment = await redisClient.json.get(key, { path: '.' });
-                if (payment.customerId == customerId) {
-                    payments.push(payment);
-                }
+                payments.push(payment);
             }
 
             if (payments.length > 0) {
-                res.status(200).json(payments);
+                return {
+                    statusCode: 200,
+                    body: JSON.stringify(payments)
+                };
             } else {
-                res.status(404).json({ error: 'No payments found for the given customer ID' });
+                return {
+                    statusCode: 404,
+                    body: JSON.stringify({ error: 'No payments found for the given customer ID' })
+                };
             }
         } else {
             // No customerId provided, retrieve all payments
@@ -155,78 +169,119 @@ app.get('/paymentsPerCustomer/:customerId?', async (req, res) => {
                 allPayments.push(payment);
             }
 
-            res.status(200).json(allPayments);
+            return {
+                statusCode: 200,
+                body: JSON.stringify(allPayments)
+            };
         }
     } catch (error) {
-        console.error('Error retrieving payments from Redis:', error);
-        res.status(500).json({ error: 'Error retrieving payments from Redis', details: error.message });
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Error retrieving payments from Redis', details: error.message })
+        };
     }
-});
+};
 
-//Order
-app.post("/orders", async (req,res) => {
-    let order = req.body;
-    //order details, include product quantity and shipping address
-    let responsestatus = order.productQuantity && order.ShippingAddress ? 200 : 400;
-
-    if (responsestatus === 200) {
-        try {
-            //addOrder function to handle order creation in the database
-            await addOrder({redisClient,order});
-            res.status(200).json({message: "Order created successfully", order:order});
-        } catch (error) {
-            console.error(error);
-            res.status(500).send("Internal Server Error");
-            return;
-        }
-    } else {
-        res.status(responsestatus);
-        res.send(
-            `Missing one of the following fields ${
-                order.productQuantity ? "" : "productQuantity"
-            } ${order.ShippingAddress ? "" : "ShippingAddress"}`
-        );
-    }
-    res.status(responsestatus).send();
-});
-
-app.get("/orders/:orderId",async(req, res)=>{
-    //get the order from the database
-    const orderId = req.params.orderId;
-    let order = await getOrder({redisClient,orderId});
-    if (order === null) {
-        res.status(404).send("Order not found");        
-    } else {
-        res.json(order);
-    }
-});
-
-//Order Items
-app.post("/orderItems", async(req, res)=>{
+// Function to handle POST requests for orders
+exports.addOrderHandler = async (event, context) => {
     try {
-        console.log("Schema: ", Schema);
-        const validate = ajv.compile(Schema);
-        const valid = validate(req.body);
-        if(!valid){
-            return res.status(400).json({ error: "Invalid request body"});
-        }
-        console.log("Request body: ", req.body);
+        const requestBody = JSON.parse(event.body);
+        const order = requestBody;
 
-        //Calling addOrderItem function and storing the result
+        // Check if required fields are present
+        if (!order.productQuantity || !order.ShippingAddress) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: 'Missing productQuantity or ShippingAddress' })
+            };
+        }
+
+        // Add order to the database
+        await addOrder({ redisClient, order });
+
+        return {
+            statusCode: 200,
+            body: JSON.stringify({ message: 'Order created successfully', order: order })
+        };
+    } catch (error) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Internal server error' })
+        };
+    }
+};
+
+// Function to handle GET requests for orders by ID
+exports.getOrderHandler = async (event, context) => {
+    try {
+        const orderId = event.pathParameters.orderId;
+
+        // Retrieve order from the database
+        const order = await getOrder({ redisClient, orderId });
+
+        if (order) {
+            return {
+                statusCode: 200,
+                body: JSON.stringify(order)
+            };
+        } else {
+            return {
+                statusCode: 404,
+                body: JSON.stringify({ error: 'Order not found' })
+            };
+        }
+    } catch (error) {
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: 'Internal server error' })
+        };
+    }
+};
+
+// Function to handle POST requests for order items
+exports.addOrderItemHandler = async (event, context) => {
+    try {
+        const requestBody = JSON.parse(event.body);
+        const validate = ajv.compile(Schema);
+        const valid = validate(requestBody);
+        if (!valid) {
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: "Invalid request body" })
+            };
+        }
+
+        // Add order item to the database
         const orderItemId = await addOrderItem({
             redisClient,
-            orderItem:req.body,
+            orderItem: requestBody,
         });
 
-        //Responsing with the result
-        res
-            .status(201)
-            .json({orderItemId, message: "Order item added successfully"});
+        return {
+            statusCode: 201,
+            body: JSON.stringify({ orderItemId, message: "Order item added successfully" })
+        };
     } catch (error) {
-        console.error("Error adding order item: ", error);
-        res.status(500).json({error:"Internal Server Error"});
-        
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ error: "Internal Server Error" })
+        };
     }
-});
+};
 
-console.log('Hello');
+// Don't forget to close Redis connection after usage
+const closeRedisConnection = () => {
+    redisClient.quit();
+};
+
+// Exporting functions
+module.exports = {
+    addBoxHandler,
+    getBoxesHandler,
+    sendPaymentHandler,
+    getPaymentHandler,
+    getPaymentsPerCustomerHandler,
+    addOrderHandler,
+    getOrderHandler,
+    addOrderItemHandler
+};
