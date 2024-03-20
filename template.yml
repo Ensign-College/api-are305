@@ -32,15 +32,15 @@ Resources:
       CacheSubnetGroupName: !Ref MyElasticacheSubnetGroup
 
   MySecurityGroup:
-  Type: AWS::EC2::SecurityGroup
-  Properties:
-    GroupDescription: Security group for Lambda function
-    VpcId: vpc-0fe47df0813c5367e
-    SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 6379
-        ToPort: 6379
-        CidrIp: 0.0.0.0/0  # This allows access from any IP, modify as needed
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for Lambda function
+      VpcId: vpc-080542bd10d35d8b3
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 6379
+          ToPort: 6379
+          CidrIp: 0.0.0.0/0  # This allows access from any IP, modify as needed
 
   # Function to handle POST requests for sending payments
   SendPaymentFunction:
