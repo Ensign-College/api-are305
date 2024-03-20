@@ -46,6 +46,7 @@ Resources:
   SendPaymentFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
+      CodeUri: .
       Handler: index.sendPaymentHandler
       Runtime: nodejs14.x
       CodeUri: ./lambda
