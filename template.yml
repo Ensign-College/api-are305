@@ -13,12 +13,12 @@ Resources:
   #     VpcId: !Ref MyVPC
   #     CidrBlock: 10.0.0.0/24
 
-  # MyElasticacheSubnetGroup:
-  #   Type: AWS::ElastiCache::SubnetGroup
-  #   Properties:
-  #     Description: Subnet group for ElastiCache
-  #     SubnetIds:
-  #       - subnet-02c217f126c0ce1d5
+  MyElasticacheSubnetGroup:
+    Type: AWS::ElastiCache::SubnetGroup
+    Properties:
+      Description: Subnet group for ElastiCache
+      SubnetIds:
+        - subnet-02c217f126c0ce1d5
 
   MyElasticacheRedis:
     Type: 'AWS::ElastiCache::CacheCluster'
