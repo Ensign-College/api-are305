@@ -2,10 +2,12 @@ const Redis = require('redis');
 const { getOrder } = require("./services/orderservice.js");
 
 const redisClient = Redis.createClient({
-    url: `redis://localhost:6379`
+    // url: `redis://localhost:6379`
+    url:`redis://${process.env.REDIS_HOST}:6379`
 });
 
 exports.getOrderHandler = async (event, context) => {
+    redisClient.connect();
     try {
         const orderId = event.pathParameters.orderId;
 

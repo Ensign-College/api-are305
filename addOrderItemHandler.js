@@ -6,10 +6,12 @@ const Ajv = require("ajv");
 const ajv = new Ajv();
 
 const redisClient = Redis.createClient({
-    url: `redis://localhost:6379`
+    // url: `redis://localhost:6379`
+    url:`redis://${process.env.REDIS_HOST}:6379`
 });
 
 exports.addOrderItemHandler = async (event, context) => {
+    redisClient.connect();
     try {
         const requestBody = JSON.parse(event.body);
         const validate = ajv.compile(Schema);
