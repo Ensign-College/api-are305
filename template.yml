@@ -46,58 +46,83 @@ Resources:
   SendPaymentFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: index.sendPaymentHandler
+      Handler: sendPaymentHandler
       Runtime: nodejs20.x
       CodeUri: .
-      MemorySize: 128
-      Timeout: 30
+      Events:
+        SendPaymentEvent:
+          Type: Api
+          Properties:
+            Path: /sendPayment
+            Method: post
+
 
   # Function to handle GET requests for payment by ID
   GetPaymentFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: index.getPaymentHandler
+      Handler: getPaymentHandler
       Runtime: nodejs20.x
       CodeUri: .
-      MemorySize: 128
-      Timeout: 30
+      Events:
+        GetPaymentEvent:
+          Type: Api
+          Properties:
+            Path: /getPayment
+            Method: get
 
   # Function to handle GET requests for payments per customer
   GetPaymentsPerCustomerFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: index.getPaymentsPerCustomerHandler
+      Handler: getPaymentsPerCustomerHandler
       Runtime: nodejs20.x
       CodeUri: .
-      MemorySize: 128
-      Timeout: 30
+      Events:
+        GetPaymentsPerCustomerEvent:
+          Type: Api
+          Properties:
+            Path: /getPaymentsPerCustomer/{customerId}
+            Method: get
 
   # Function to handle POST requests for orders
   AddOrderFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: index.addOrderHandler
+      Handler: addOrderHandler
       Runtime: nodejs20.x
       CodeUri: .
-      MemorySize: 128
-      Timeout: 30
+      Events:
+        AddOrderEvent:
+          Type: Api
+          Properties:
+            Path: /addOrder
+            Method: post
 
   # Function to handle GET requests for orders by ID
   GetOrderFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: index.getOrderHandler
+      Handler: getOrderHandler
       Runtime: nodejs20.x
       CodeUri: .
-      MemorySize: 128
-      Timeout: 30
+      Events:
+        GetOrderEvent:
+          Type: Api
+          Properties:
+            Path: /getOrder/{orderId}
+            Method: get
 
   # Function to handle POST requests for order items
   AddOrderItemFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: index.addOrderItemHandler
+      Handler: addOrderItemHandler
       Runtime: nodejs20.x
       CodeUri: .
-      MemorySize: 128
-      Timeout: 30
+      Events:
+        AddOrderItemEvent:
+          Type: Api
+          Properties:
+            Path: /addOrderItem
+            Method: post
