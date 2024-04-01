@@ -46,7 +46,7 @@ Resources:
   SendPaymentFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: sendPaymentHandler
+      Handler: sendPaymentHandler.sendPaymentHandler
       Runtime: nodejs20.x
       CodeUri: .
       Environment:
@@ -63,7 +63,7 @@ Resources:
   GetPaymentFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: getPaymentHandler
+      Handler: getPaymentHandler.getPaymentHandler
       Runtime: nodejs20.x
       CodeUri: .
       Environment:
@@ -80,7 +80,7 @@ Resources:
   GetPaymentsPerCustomerFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: getPaymentsPerCustomerHandler
+      Handler: getPaymentsPerCustomerHandler.getPaymentsPerCustomerHandler
       Runtime: nodejs20.x
       CodeUri: .
       Environment:
@@ -97,7 +97,7 @@ Resources:
   AddOrderFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: addOrderHandler
+      Handler: addOrderHandler.addOrderHandler
       Runtime: nodejs20.x
       CodeUri: .
       Environment:
@@ -114,7 +114,7 @@ Resources:
   GetOrderFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: getOrderHandler
+      Handler: getOrderHandler.getOrderHandler
       Runtime: nodejs20.x
       CodeUri: .
       Environment:
@@ -131,7 +131,7 @@ Resources:
   AddOrderItemFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: addOrderItemHandler
+      Handler: addOrderItemHandler.addOrderItemHandler
       Runtime: nodejs20.x
       CodeUri: .
       Environment:
