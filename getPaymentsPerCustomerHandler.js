@@ -1,7 +1,7 @@
 const Redis = require('redis');
 
 const redisClient = Redis.createClient({
-    url: `redis://localhost:6379`
+    url: `redis://are-my-1fuxaenocedtk.kxxsr4.0001.use1.cache.amazonaws.com:6379`
 });
 
 exports.getPaymentsPerCustomerHandler = async (event, context) => {
