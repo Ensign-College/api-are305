@@ -2,24 +2,23 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 
 Resources:
-  MyVPC:
-    Type: AWS::EC2::VPC
-    Properties:
-      CidrBlock: 10.0.0.0/16
+  # MyVPC:
+  #   Type: AWS::EC2::VPC
+  #   Properties:
+  #     CidrBlock: 10.0.0.0/16
 
-  MySubnet:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId: !Ref MyVPC
-      CidrBlock: 10.0.0.0/24
+  # MySubnet:
+  #   Type: AWS::EC2::Subnet
+  #   Properties:
+  #     VpcId: !Ref MyVPC
+  #     CidrBlock: 10.0.0.0/24
 
   MyElasticacheSubnetGroup:
     Type: AWS::ElastiCache::SubnetGroup
     Properties:
       Description: Subnet group for ElastiCache
       SubnetIds:
-        # - subnet-02c217f126c0ce1d5
-        - !Ref MySubnet
+        - subnet-02c217f126c0ce1d5
 
   MyElasticacheRedis:
     Type: 'AWS::ElastiCache::CacheCluster'
@@ -36,8 +35,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Security group for Lambda function
-      # VpcId: vpc-066e6a637e37f2752
-      VpcId: !Ref MyVPC
+      VpcId: vpc-066e6a637e37f2752
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 6379
@@ -54,18 +52,12 @@ Resources:
       Environment:
         Variables:
           REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
-          REDIS_PORT: !GetAtt MyElasticacheRedis.RedisEndpoint.Port
-      VpcConfig:
-        SecurityGroupIds:
-          - !GetAtt MySecurityGroup.GroupId
-        SubnetIds:
-          - !Ref MySubnet
       Events:
         SendPaymentEvent:
-          Type: HttpApi
+          Type: Api
           Properties:
             Path: /sendPayment
-            Method: any
+            Method: post
 
   # Function to handle GET requests for payment by ID
   GetPaymentFunction:
@@ -77,20 +69,14 @@ Resources:
       Environment:
         Variables:
           REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
-          REDIS_PORT: !GetAtt MyElasticacheRedis.RedisEndpoint.Port
-      VpcConfig:
-        SecurityGroupIds:
-          - !GetAtt MySecurityGroup.GroupId
-        SubnetIds:
-          - !Ref MySubnet
       Events:
         GetPaymentEvent:
-          Type: HttpApi
+          Type: Api
           Properties:
             Path: /getPayment
-            Method: any
+            Method: get
 
-  # Function to handle GET requests for payments per customer
+  # # Function to handle GET requests for payments per customer
   # GetPaymentsPerCustomerFunction:
   #   Type: 'AWS::Serverless::Function'
   #   Properties:
@@ -107,7 +93,7 @@ Resources:
   #           Path: /getPaymentsPerCustomer/{customerId}
   #           Method: get
 
-  # Function to handle POST requests for orders
+  # # Function to handle POST requests for orders
   # AddOrderFunction:
   #   Type: 'AWS::Serverless::Function'
   #   Properties:
@@ -124,7 +110,7 @@ Resources:
   #           Path: /addOrder
   #           Method: post
 
-  # Function to handle GET requests for orders by ID
+  # # Function to handle GET requests for orders by ID
   # GetOrderFunction:
   #   Type: 'AWS::Serverless::Function'
   #   Properties:
@@ -141,7 +127,7 @@ Resources:
   #           Path: /getOrder/{orderId}
   #           Method: get
 
-  # Function to handle POST requests for order items
+  # # Function to handle POST requests for order items
   # AddOrderItemFunction:
   #   Type: 'AWS::Serverless::Function'
   #   Properties:
