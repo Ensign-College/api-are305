@@ -1,18 +1,9 @@
-import Redis from 'redis'
-
-const redisHost = process.env.REDIS_HOST;
-const redisPort = process.env.REDIS_PORT;
+const Redis = require('redis');
 
 const redisClient = Redis.createClient({
-    socket: {
-        host: redisHost,
-        port: redisPort
-    },
-    tls: {},
-    ssl: true,
+    // url: `redis://are-my-1fuxaenocedtk.kxxsr4.0001.use1.cache.amazonaws.com:6379`
+    url:`redis://${process.env.REDIS_HOST}:6379`
 });
-
-redisClient.on('error', err => console.error('ElastiCache: Error while attempting to establish connection', err));
 
 exports.sendPaymentHandler = async (event, context) => {
     redisClient.connect();
