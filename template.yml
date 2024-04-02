@@ -53,9 +53,6 @@ Resources:
         Variables:
           REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
           REDIS_PORT: !GetAtt MyElasticacheRedis.RedisEndpoint.Port
-      VpcConfig:
-        SecurityGroupIds:
-          - !GetAtt MySecurityGroup.GroupId
       Events:
         SendPaymentEvent:
           Type: Api
@@ -74,9 +71,6 @@ Resources:
         Variables:
           REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
           REDIS_PORT: !GetAtt MyElasticacheRedis.RedisEndpoint.Port
-      VpcConfig:
-        SecurityGroupIds:
-          - !GetAtt MySecurityGroup.GroupId
       Events:
         GetPaymentEvent:
           Type: Api
