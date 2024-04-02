@@ -18,7 +18,8 @@ Resources:
     Properties:
       Description: Subnet group for ElastiCache
       SubnetIds:
-        - subnet-02c217f126c0ce1d5
+        # - subnet-02c217f126c0ce1d5
+        - !Ref MySubnet
 
   MyElasticacheRedis:
     Type: 'AWS::ElastiCache::CacheCluster'
@@ -35,7 +36,8 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Security group for Lambda function
-      VpcId: vpc-066e6a637e37f2752
+      # VpcId: vpc-066e6a637e37f2752
+      VpcId: !Ref MyVPC
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 6379
@@ -60,10 +62,10 @@ Resources:
           - !Ref MySubnet
       Events:
         SendPaymentEvent:
-          Type: Api
+          Type: HttpApi
           Properties:
             Path: /sendPayment
-            Method: post
+            Method: any
 
   # Function to handle GET requests for payment by ID
   GetPaymentFunction:
@@ -89,69 +91,69 @@ Resources:
             Method: any
 
   # Function to handle GET requests for payments per customer
-  GetPaymentsPerCustomerFunction:
-    Type: 'AWS::Serverless::Function'
-    Properties:
-      Handler: getPaymentsPerCustomerHandler.getPaymentsPerCustomerHandler
-      Runtime: nodejs20.x
-      CodeUri: .
-      Environment:
-        Variables:
-          REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
-      Events:
-        GetPaymentsPerCustomerEvent:
-          Type: Api
-          Properties:
-            Path: /getPaymentsPerCustomer/{customerId}
-            Method: get
+  # GetPaymentsPerCustomerFunction:
+  #   Type: 'AWS::Serverless::Function'
+  #   Properties:
+  #     Handler: getPaymentsPerCustomerHandler.getPaymentsPerCustomerHandler
+  #     Runtime: nodejs20.x
+  #     CodeUri: .
+  #     Environment:
+  #       Variables:
+  #         REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
+  #     Events:
+  #       GetPaymentsPerCustomerEvent:
+  #         Type: Api
+  #         Properties:
+  #           Path: /getPaymentsPerCustomer/{customerId}
+  #           Method: get
 
   # Function to handle POST requests for orders
-  AddOrderFunction:
-    Type: 'AWS::Serverless::Function'
-    Properties:
-      Handler: addOrderHandler.addOrderHandler
-      Runtime: nodejs20.x
-      CodeUri: .
-      Environment:
-        Variables:
-          REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
-      Events:
-        AddOrderEvent:
-          Type: Api
-          Properties:
-            Path: /addOrder
-            Method: post
+  # AddOrderFunction:
+  #   Type: 'AWS::Serverless::Function'
+  #   Properties:
+  #     Handler: addOrderHandler.addOrderHandler
+  #     Runtime: nodejs20.x
+  #     CodeUri: .
+  #     Environment:
+  #       Variables:
+  #         REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
+  #     Events:
+  #       AddOrderEvent:
+  #         Type: Api
+  #         Properties:
+  #           Path: /addOrder
+  #           Method: post
 
   # Function to handle GET requests for orders by ID
-  GetOrderFunction:
-    Type: 'AWS::Serverless::Function'
-    Properties:
-      Handler: getOrderHandler.getOrderHandler
-      Runtime: nodejs20.x
-      CodeUri: .
-      Environment:
-        Variables:
-          REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
-      Events:
-        GetOrderEvent:
-          Type: Api
-          Properties:
-            Path: /getOrder/{orderId}
-            Method: get
+  # GetOrderFunction:
+  #   Type: 'AWS::Serverless::Function'
+  #   Properties:
+  #     Handler: getOrderHandler.getOrderHandler
+  #     Runtime: nodejs20.x
+  #     CodeUri: .
+  #     Environment:
+  #       Variables:
+  #         REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
+  #     Events:
+  #       GetOrderEvent:
+  #         Type: Api
+  #         Properties:
+  #           Path: /getOrder/{orderId}
+  #           Method: get
 
   # Function to handle POST requests for order items
-  AddOrderItemFunction:
-    Type: 'AWS::Serverless::Function'
-    Properties:
-      Handler: addOrderItemHandler.addOrderItemHandler
-      Runtime: nodejs20.x
-      CodeUri: .
-      Environment:
-        Variables:
-          REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
-      Events:
-        AddOrderItemEvent:
-          Type: Api
-          Properties:
-            Path: /addOrderItem
-            Method: post
+  # AddOrderItemFunction:
+  #   Type: 'AWS::Serverless::Function'
+  #   Properties:
+  #     Handler: addOrderItemHandler.addOrderItemHandler
+  #     Runtime: nodejs20.x
+  #     CodeUri: .
+  #     Environment:
+  #       Variables:
+  #         REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
+  #     Events:
+  #       AddOrderItemEvent:
+  #         Type: Api
+  #         Properties:
+  #           Path: /addOrderItem
+  #           Method: post

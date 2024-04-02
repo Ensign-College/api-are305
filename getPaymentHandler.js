@@ -10,6 +10,8 @@ const redisClient = Redis.createClient({
     ssl: true,
 });
 
+redisClient.on('error', err => console.error('ElastiCache: Error while attempting to establish connection', err));
+
 exports.getPaymentHandler = async (event, context) => {
     
     try {
