@@ -1,6 +1,5 @@
 // const Redis = require('redis');
 import Redis from 'redis'
-import { v4 as uuidv4 } from 'uuid';
 
 const redisClient = Redis.createClient({
     socket: {

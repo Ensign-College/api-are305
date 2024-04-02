@@ -75,12 +75,18 @@ Resources:
       Environment:
         Variables:
           REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
+          REDIS_PORT: !GetAtt MyElasticacheRedis.RedisEndpoint.Port
+      VpcConfig:
+        SecurityGroupIds:
+          - !GetAtt MySecurityGroup.GroupId
+        SubnetIds:
+          - !Ref MySubnet
       Events:
         GetPaymentEvent:
-          Type: Api
+          Type: HttpApi
           Properties:
             Path: /getPayment
-            Method: get
+            Method: any
 
   # Function to handle GET requests for payments per customer
   GetPaymentsPerCustomerFunction:
