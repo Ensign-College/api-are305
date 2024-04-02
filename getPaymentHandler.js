@@ -1,13 +1,21 @@
-const Redis = require('redis');
+// const Redis = require('redis');
+import Redis from 'redis'
+import { v4 as uuidv4 } from 'uuid';
 
 const redisClient = Redis.createClient({
-    // url: `redis://localhost:6379`
-    url:`redis://${process.env.REDIS_HOST}:6379`
+    socket: {
+        host: `${process.env.REDIS_HOST}`,
+        port: `${process.env.REDIS_PORT}`
+    },
+    tls: {},
+    ssl: true,
 });
 
 exports.getPaymentHandler = async (event, context) => {
-    redisClient.connect();
+    
     try {
+        console.log('getPaymentHandler START');
+
         const paymentId = event.pathParameters.paymentId;
 
         // Retrieve payment from Redis
