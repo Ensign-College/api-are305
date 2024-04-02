@@ -56,8 +56,6 @@ Resources:
       VpcConfig:
         SecurityGroupIds:
           - !GetAtt MySecurityGroup.GroupId
-        SubnetIds:
-          - !Ref MySubnet
       Events:
         SendPaymentEvent:
           Type: Api
@@ -79,8 +77,6 @@ Resources:
       VpcConfig:
         SecurityGroupIds:
           - !GetAtt MySecurityGroup.GroupId
-        SubnetIds:
-          - !Ref MySubnet
       Events:
         GetPaymentEvent:
           Type: Api
