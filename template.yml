@@ -76,70 +76,70 @@ Resources:
             Path: /getPayment
             Method: get
 
-  # # Function to handle GET requests for payments per customer
-  # GetPaymentsPerCustomerFunction:
-  #   Type: 'AWS::Serverless::Function'
-  #   Properties:
-  #     Handler: getPaymentsPerCustomerHandler.getPaymentsPerCustomerHandler
-  #     Runtime: nodejs20.x
-  #     CodeUri: .
-  #     Environment:
-  #       Variables:
-  #         REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
-  #     Events:
-  #       GetPaymentsPerCustomerEvent:
-  #         Type: Api
-  #         Properties:
-  #           Path: /getPaymentsPerCustomer/{customerId}
-  #           Method: get
+  # Function to handle GET requests for payments per customer
+  GetPaymentsPerCustomerFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: getPaymentsPerCustomerHandler.getPaymentsPerCustomerHandler
+      Runtime: nodejs20.x
+      CodeUri: .
+      Environment:
+        Variables:
+          REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
+      Events:
+        GetPaymentsPerCustomerEvent:
+          Type: Api
+          Properties:
+            Path: /getPaymentsPerCustomer/{customerId}
+            Method: get
 
-  # # Function to handle POST requests for orders
-  # AddOrderFunction:
-  #   Type: 'AWS::Serverless::Function'
-  #   Properties:
-  #     Handler: addOrderHandler.addOrderHandler
-  #     Runtime: nodejs20.x
-  #     CodeUri: .
-  #     Environment:
-  #       Variables:
-  #         REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
-  #     Events:
-  #       AddOrderEvent:
-  #         Type: Api
-  #         Properties:
-  #           Path: /addOrder
-  #           Method: post
+  # Function to handle POST requests for orders
+  AddOrderFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: addOrderHandler.addOrderHandler
+      Runtime: nodejs20.x
+      CodeUri: .
+      Environment:
+        Variables:
+          REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
+      Events:
+        AddOrderEvent:
+          Type: Api
+          Properties:
+            Path: /addOrder
+            Method: post
 
-  # # Function to handle GET requests for orders by ID
-  # GetOrderFunction:
-  #   Type: 'AWS::Serverless::Function'
-  #   Properties:
-  #     Handler: getOrderHandler.getOrderHandler
-  #     Runtime: nodejs20.x
-  #     CodeUri: .
-  #     Environment:
-  #       Variables:
-  #         REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
-  #     Events:
-  #       GetOrderEvent:
-  #         Type: Api
-  #         Properties:
-  #           Path: /getOrder/{orderId}
-  #           Method: get
+  # Function to handle GET requests for orders by ID
+  GetOrderFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: getOrderHandler.getOrderHandler
+      Runtime: nodejs20.x
+      CodeUri: .
+      Environment:
+        Variables:
+          REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
+      Events:
+        GetOrderEvent:
+          Type: Api
+          Properties:
+            Path: /getOrder/{orderId}
+            Method: get
 
-  # # Function to handle POST requests for order items
-  # AddOrderItemFunction:
-  #   Type: 'AWS::Serverless::Function'
-  #   Properties:
-  #     Handler: addOrderItemHandler.addOrderItemHandler
-  #     Runtime: nodejs20.x
-  #     CodeUri: .
-  #     Environment:
-  #       Variables:
-  #         REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
-  #     Events:
-  #       AddOrderItemEvent:
-  #         Type: Api
-  #         Properties:
-  #           Path: /addOrderItem
-  #           Method: post
+  # Function to handle POST requests for order items
+  AddOrderItemFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: addOrderItemHandler.addOrderItemHandler
+      Runtime: nodejs20.x
+      CodeUri: .
+      Environment:
+        Variables:
+          REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
+      Events:
+        AddOrderItemEvent:
+          Type: Api
+          Properties:
+            Path: /addOrderItem
+            Method: post
