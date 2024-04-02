@@ -1,10 +1,13 @@
 // const Redis = require('redis');
 import Redis from 'redis'
 
+const redisHost = process.env.REDIS_HOST;
+const redisPort = process.env.REDIS_PORT;
+
 const redisClient = Redis.createClient({
     socket: {
-        host: `${process.env.REDIS_HOST}`,
-        port: `${process.env.REDIS_PORT}`
+        host: redisHost,
+        port: redisPort
     },
     tls: {},
     ssl: true,

@@ -1,9 +1,18 @@
-const Redis = require('redis');
+import Redis from 'redis'
+
+const redisHost = process.env.REDIS_HOST;
+const redisPort = process.env.REDIS_PORT;
 
 const redisClient = Redis.createClient({
-    // url: `redis://localhost:6379`
-    url:`redis://${process.env.REDIS_HOST}:6379`
+    socket: {
+        host: redisHost,
+        port: redisPort
+    },
+    tls: {},
+    ssl: true,
 });
+
+redisClient.on('error', err => console.error('ElastiCache: Error while attempting to establish connection', err));
 
 exports.sendPaymentHandler = async (event, context) => {
     redisClient.connect();
