@@ -15,11 +15,12 @@ const redisClient = Redis.createClient({
 redisClient.on('error', err => console.error('Error de conexión con ElastiCache:', err));
 
 exports.getPaymentHandler = async (event, context) => {
-    redisClient.connect();
+    await redisClient.connect();
     try {
         console.log('getPaymentHandler START');
 
-        const paymentId = event.pathParameters.paymentId;
+        // const paymentId = event.pathParameters.paymentId;
+        const paymentId = "1";
 
         // Retrieve payment from Redis
         const paymentKey = `payment-${paymentId}`;

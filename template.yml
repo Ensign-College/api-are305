@@ -43,6 +43,21 @@ Resources:
           ToPort: 6379
           CidrIp: 0.0.0.0/0  # This allows access from any IP, modify as needed
 
+  are305LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: are305LambdaRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      MaznagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+
   # Function to handle POST requests for sending payments
   SendPaymentFunction:
     Type: 'AWS::Serverless::Function'
@@ -87,7 +102,8 @@ Resources:
           Type: HttpApi
           Properties:
             Path: /getPayment
-            Method: any
+            Method: get
+      Role: !Ref are305LambdaRole
 
   # # Function to handle GET requests for payments per customer
   # GetPaymentsPerCustomerFunction:
