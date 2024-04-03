@@ -80,7 +80,7 @@ Resources:
           Properties:
             Path: /sendPayment
             Method: any
-      Role: !Ref Are305LambdaRole
+      Role: arn:aws:iam::730335528058:role/Are305LambdaRole
 
   # Function to handle GET requests for payment by ID
   GetPaymentFunction:
@@ -104,7 +104,7 @@ Resources:
           Properties:
             Path: /getPayment
             Method: get
-      Role: !Ref Are305LambdaRole
+      Role: arn:aws:iam::730335528058:role/Are305LambdaRole
 
   # # Function to handle GET requests for payments per customer
   # GetPaymentsPerCustomerFunction:
