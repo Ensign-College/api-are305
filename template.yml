@@ -79,7 +79,7 @@ Resources:
           Type: HttpApi
           Properties:
             Path: /sendPayment
-            Method: any
+            Method: post
       Role: arn:aws:iam::730335528058:role/Are305LambdaRole
 
   # Function to handle GET requests for payment by ID
@@ -102,7 +102,7 @@ Resources:
         HttpApi:
           Type: HttpApi
           Properties:
-            Path: /getPayment
+            Path: /getPayment/{paymentId}
             Method: get
       Role: arn:aws:iam::730335528058:role/Are305LambdaRole
 

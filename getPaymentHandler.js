@@ -19,8 +19,8 @@ exports.getPaymentHandler = async (event, context) => {
     try {
         console.log('getPaymentHandler START');
 
-        // const paymentId = event.pathParameters.paymentId;
-        const paymentId = "1";
+        const paymentId = event.pathParameters.paymentId;
+        //const paymentId = "1";
 
         // Retrieve payment from Redis
         const paymentKey = `payment-${paymentId}`;

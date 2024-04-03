@@ -116,7 +116,7 @@ app.get('/payment/:paymentId', async (req, res) => {
         if (payment) {
             res.status(200).json(payment);
         } else {
-            res.status(404).json({ error: 'Payment not found for the given payment ID' });
+            res.status(404).json({ error: `Payment not found for the payment ID: ${paymentId}` });
         }
     } catch (error) {
         console.error('Error retrieving payment from Redis:', error);
