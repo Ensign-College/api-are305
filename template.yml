@@ -1,5 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
+Description: Lambda App
 
 Resources:
   # MyVPC:
@@ -59,8 +60,8 @@ Resources:
         SubnetIds:
           - subnet-02c217f126c0ce1d5
       Events:
-        SendPaymentEvent:
-          Type: Api
+        HttpApi:
+          Type: HttpApi
           Properties:
             Path: /sendPayment
             Method: any
@@ -82,8 +83,8 @@ Resources:
         SubnetIds:
           - subnet-02c217f126c0ce1d5
       Events:
-        GetPaymentEvent:
-          Type: Api
+        HttpApi:
+          Type: HttpApi
           Properties:
             Path: /getPayment
             Method: any
