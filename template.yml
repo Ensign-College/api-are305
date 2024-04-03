@@ -43,10 +43,10 @@ Resources:
           ToPort: 6379
           CidrIp: 0.0.0.0/0  # This allows access from any IP, modify as needed
 
-  are305LambdaRole:
+  Are305LambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: are305LambdaRole
+      RoleName: Are305LambdaRole
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -80,6 +80,7 @@ Resources:
           Properties:
             Path: /sendPayment
             Method: any
+      Role: !Ref Are305LambdaRole
 
   # Function to handle GET requests for payment by ID
   GetPaymentFunction:
@@ -103,7 +104,7 @@ Resources:
           Properties:
             Path: /getPayment
             Method: get
-      Role: !Ref are305LambdaRole
+      Role: !Ref Are305LambdaRole
 
   # # Function to handle GET requests for payments per customer
   # GetPaymentsPerCustomerFunction:
