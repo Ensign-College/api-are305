@@ -4,18 +4,24 @@ const redisHost = process.env.REDIS_HOST;
 const redisPort = process.env.REDIS_PORT;
 
 const redisClient = Redis.createClient({
-  socket: {
     host: redisHost,
-    port: redisPort
-  },
-  tls: {},
-  ssl: true,
+    port: redisPort,
+    tls: {},
+    ssl: true,
 });
 
 redisClient.on('error', err => console.error('Error de conexión con ElastiCache:', err));
 
+redisClient.connect(err => {
+    if (err) {
+        console.error('Error connecting to Redis:', err);
+    } else {
+        console.log('Connected to Redis');
+    }
+});
+
 exports.getPaymentHandler = async (event, context) => {
-    await redisClient.connect();
+    
     try {
         console.log('getPaymentHandler START');
 
@@ -35,7 +41,7 @@ exports.getPaymentHandler = async (event, context) => {
         } else {
             return {
                 statusCode: 404,
-                body: JSON.stringify({ error: 'Payment not found for the given payment ID' })
+                body: JSON.stringify({ error: `Payment not found for the given payment ID: ${paymentId}` })
             };
         }
     } catch (error) {
