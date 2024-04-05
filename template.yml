@@ -43,10 +43,10 @@ Resources:
           ToPort: 6379
           CidrIp: 0.0.0.0/0  # This allows access from any IP, modify as needed
 
-  Are305LambdaRole:
+  ArecLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: Are305LambdaRole
+      RoleName: ArecLambdaRole
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -80,7 +80,7 @@ Resources:
           Properties:
             Path: /sendPayment
             Method: post
-      Role: arn:aws:iam::730335528058:role/Are305LambdaRole
+      Role: arn:aws:iam::730335528058:role/ArecLambdaRole
 
   # Function to handle GET requests for payment by ID
   GetPaymentFunction:
@@ -104,7 +104,7 @@ Resources:
           Properties:
             Path: /getPayment/{paymentId}
             Method: get
-      Role: arn:aws:iam::730335528058:role/Are305LambdaRole
+      Role: arn:aws:iam::730335528058:role/ArecLambdaRole
 
   # # Function to handle GET requests for payments per customer
   # GetPaymentsPerCustomerFunction:
