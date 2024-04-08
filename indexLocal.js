@@ -229,4 +229,15 @@ app.post("/orderItems", async(req, res)=>{
     }
 });
 
+app.get("/orderItems/:orderItemId",async(req, res)=>{
+    //get the order from the database
+    const orderItemId = req.params.orderItemId;
+    let orderItem = await getOrderItem({redisClient,orderItemId});
+    if (orderItem === null) {
+        res.status(404).send("OrderItem not found");        
+    } else {
+        res.json(orderItem);
+    }
+});
+
 console.log('Hello');
