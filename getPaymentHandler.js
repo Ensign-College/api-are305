@@ -40,17 +40,18 @@ exports.getPaymentHandler = async (event, context) => {
 
         // Retrieve payment from Redis
         const paymentKey = `payment-${paymentId}`;
+        console.log(`getPaymentHandler paymentId: ${paymentId}`);
 
-        // const payment = await redisClient.json.get(paymentKey, { path: '.' });
-        const payment = await new Promise((resolve, reject) => {
-            redisClient.json.get(paymentKey, (err, reply) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(reply);
-                }
-            });
-        });
+        const payment = await redisClient.json.get(paymentKey, { path: '.' });
+        // const payment = await new Promise((resolve, reject) => {
+        //     redisClient.json.get(paymentKey, (err, reply) => {
+        //         if (err) {
+        //             reject(err);
+        //         } else {
+        //             resolve(reply);
+        //         }
+        //     });
+        // });
 
         if (payment) {
             return {
