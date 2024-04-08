@@ -62,7 +62,7 @@ exports.sendPaymentHandler = async (event, context) => {
 
         return {
             statusCode: 200,
-            body: JSON.stringify({ message: 'Payment successfully stored in Redis ID: ', paymentKey })
+            body: JSON.stringify({ message: 'Payment successfully stored in Redis.', paymentId })
         };
     } catch (error) {
         console.error('Unhandled error in sendPaymentHandler:', error);
