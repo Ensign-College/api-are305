@@ -3,35 +3,54 @@ const Redis = require('redis');
 const redisHost = process.env.REDIS_HOST;
 const redisPort = process.env.REDIS_PORT;
 
-const redisClient = Redis.createClient({
-    host: redisHost,
-    port: redisPort,
-    tls: {},
-    ssl: true,
-});
+let redisClient;
 
-redisClient.on('error', err => console.error('Error de conexión con ElastiCache:', err));
+// Function to create Redis connection
+const createRedisClient = () => {
+    redisClient = Redis.createClient({
+        host: redisHost,
+        port: redisPort,
+        tls: {},
+        ssl: true,
+    });
 
-redisClient.connect(err => {
-    if (err) {
+    redisClient.on('error', err => {
         console.error('Error connecting to Redis:', err);
-    } else {
-        console.log('Connected to Redis');
+        // Attempt to reconnect
+        redisClient = createRedisClient();
+    });
+
+    return redisClient;
+};
+
+// Initialize Redis client
+const initializeRedisClient = () => {
+    if (!redisClient) {
+        redisClient = createRedisClient();
     }
-});
+};
 
 exports.getPaymentHandler = async (event, context) => {
-    
+    initializeRedisClient();
+  
     try {
         console.log('getPaymentHandler START');
 
         const paymentId = event.pathParameters.paymentId;
-        //const paymentId = "1";
 
         // Retrieve payment from Redis
         const paymentKey = `payment-${paymentId}`;
 
-        const payment = await redisClient.json.get(paymentKey, { path: '.' });
+        // const payment = await redisClient.json.get(paymentKey, { path: '.' });
+        const payment = await new Promise((resolve, reject) => {
+            redisClient.json.get(paymentKey, (err, reply) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(reply);
+                }
+            });
+        });
 
         if (payment) {
             return {
