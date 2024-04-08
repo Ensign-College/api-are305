@@ -4,10 +4,8 @@ const redisHost = process.env.REDIS_HOST;
 const redisPort = process.env.REDIS_PORT;
 
 const redisClient = Redis.createClient({
-    socket: {
-      host: redisHost,
-      port: redisPort
-    },
+    host: redisHost,
+    port: redisPort,
     tls: {},
     ssl: true,
   });
@@ -43,5 +41,7 @@ exports.getPaymentHandler = async (event, context) => {
             statusCode: 500,
             body: JSON.stringify({ error: 'Error retrieving payment from Redis', details: error.message })
         };
+    } finally {
+        redisClient.disconnect();
     }
 };
