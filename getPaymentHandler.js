@@ -7,20 +7,20 @@ let redisClient;
 
 // Function to create Redis connection
 const createRedisClient = () => {
-    redisClient = Redis.createClient({
+    const client = Redis.createClient({
         host: redisHost,
         port: redisPort,
         tls: {},
         ssl: true,
     });
 
-    redisClient.on('error', err => {
+    client.on('error', err => {
         console.error('Error connecting to Redis:', err);
         // Attempt to reconnect
-        redisClient = createRedisClient();
+        createRedisClient();
     });
 
-    return redisClient;
+    return client;
 };
 
 // Initialize Redis client
@@ -42,16 +42,15 @@ exports.getPaymentHandler = async (event, context) => {
         const paymentKey = `payment-${paymentId}`;
         console.log(`getPaymentHandler paymentId: ${paymentId}`);
 
-        const payment = await redisClient.json.get(paymentKey, { path: '.' });
-        // const payment = await new Promise((resolve, reject) => {
-        //     redisClient.json.get(paymentKey, (err, reply) => {
-        //         if (err) {
-        //             reject(err);
-        //         } else {
-        //             resolve(reply);
-        //         }
-        //     });
-        // });
+        const payment = await new Promise((resolve, reject) => {
+            redisClient.json.get(paymentKey, { path: '.' }, (err, reply) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(reply);
+                }
+            });
+        });
 
         if (payment) {
             return {
