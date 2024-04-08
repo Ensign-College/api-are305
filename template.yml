@@ -66,6 +66,8 @@ Resources:
       Handler: sendPaymentHandler.sendPaymentHandler
       Runtime: nodejs20.x
       CodeUri: .
+      Timeout: 30
+      MemorySize: 256
       Environment:
         Variables:
           REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
@@ -90,6 +92,8 @@ Resources:
       Handler: getPaymentHandler.getPaymentHandler
       Runtime: nodejs20.x
       CodeUri: .
+      Timeout: 30
+      MemorySize: 256
       Environment:
         Variables:
           REDIS_HOST: !GetAtt MyElasticacheRedis.RedisEndpoint.Address
