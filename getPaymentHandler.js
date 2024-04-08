@@ -30,18 +30,24 @@ const initializeRedisClient = () => {
     }
 };
 
+// Initialize Redis client outside of try...catch
+initializeRedisClient();
+
 exports.getPaymentHandler = async (event, context) => {
     try {
         console.log('getPaymentHandler START');
 
         const paymentId = event.pathParameters.paymentId;
 
+        // Ensure redisClient is initialized
+        initializeRedisClient();
+
         // Retrieve payment from Redis
         const paymentKey = `payment-${paymentId}`;
         console.log(`getPaymentHandler paymentId: ${paymentId}`);
 
         const payment = await new Promise((resolve, reject) => {
-            redisClient.json.get(paymentKey, { path: '.' }, (err, reply) => {
+            redisClient.get(paymentKey, (err, reply) => {
                 if (err) {
                     console.error('Error retrieving payment from Redis:', err);
                     reject(err);
