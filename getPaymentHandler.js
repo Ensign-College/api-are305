@@ -16,6 +16,8 @@ const createRedisClient = () => {
 
     client.on('error', err => {
         console.error('Error connecting to Redis:', err);
+        // Re-initialize Redis client on error
+        initializeRedisClient();
     });
 
     return client;
@@ -68,6 +70,8 @@ exports.getPaymentHandler = async (event, context) => {
         }
     } catch (error) {
         console.error('Unhandled error in getPaymentHandler:', error);
+        // Re-initialize Redis client on error
+        initializeRedisClient();
         return {
             statusCode: 500,
             body: JSON.stringify({ error: 'Error retrieving payment from Redis', details: error.message })
