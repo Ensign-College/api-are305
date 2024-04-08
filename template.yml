@@ -42,6 +42,7 @@ Resources:
           FromPort: 6379
           ToPort: 6379
           CidrIp: 0.0.0.0/0  # This allows access from any IP, modify as needed
+    DeletionPolicy: Delete
 
   ArecLambdaRole:
     Type: AWS::IAM::Role
