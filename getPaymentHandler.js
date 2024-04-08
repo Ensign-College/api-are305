@@ -42,6 +42,6 @@ exports.getPaymentHandler = async (event, context) => {
             body: JSON.stringify({ error: 'Error retrieving payment from Redis', details: error.message })
         };
     } finally {
-        redisClient.disconnect();
+        await redisClient.quit();
     }
 };

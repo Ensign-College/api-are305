@@ -69,6 +69,6 @@ exports.sendPaymentHandler = async (event, context) => {
             body: JSON.stringify({ error: 'Error sending payment to Redis', details: error.message })
         };
     } finally {
-        redisClient.disconnect();
+        await redisClient.quit();
     }
 };
