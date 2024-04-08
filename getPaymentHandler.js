@@ -6,6 +6,7 @@ const redisPort = process.env.REDIS_PORT;
 let redisClient;
 
 const createRedisClient = () => {
+    console.log('createRedisClient() START');
     const client = Redis.createClient({
         host: redisHost,
         port: redisPort,
@@ -40,16 +41,7 @@ exports.getPaymentHandler = async (event, context) => {
         const paymentKey = `payment-${paymentId}`;
         console.log(`getPaymentHandler paymentId: ${paymentId}`);
 
-        const payment = await new Promise((resolve, reject) => {
-            redisClient.get(paymentKey, (err, reply) => {
-                if (err) {
-                    console.error('Error retrieving payment from Redis:', err);
-                    reject(err);
-                } else {
-                    resolve(reply);
-                }
-            });
-        });
+        const payment = await redisClient.json.get(paymentKey, { path: '.' });
 
         if (payment) {
             return {
