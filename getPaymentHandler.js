@@ -31,8 +31,6 @@ const initializeRedisClient = () => {
 };
 
 exports.getPaymentHandler = async (event, context) => {
-    initializeRedisClient();
-  
     try {
         console.log('getPaymentHandler START');
 
@@ -45,6 +43,7 @@ exports.getPaymentHandler = async (event, context) => {
         const payment = await new Promise((resolve, reject) => {
             redisClient.json.get(paymentKey, { path: '.' }, (err, reply) => {
                 if (err) {
+                    console.error('Error retrieving payment from Redis:', err);
                     reject(err);
                 } else {
                     resolve(reply);
@@ -64,6 +63,7 @@ exports.getPaymentHandler = async (event, context) => {
             };
         }
     } catch (error) {
+        console.error('Unhandled error in getPaymentHandler:', error);
         return {
             statusCode: 500,
             body: JSON.stringify({ error: 'Error retrieving payment from Redis', details: error.message })
